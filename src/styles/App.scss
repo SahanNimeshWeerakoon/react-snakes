@@ -1,10 +1,17 @@
+body {
+	overflow: hidden;
+}
 .game-area {
 	position: relative;
 	margin: 50px auto;
 	width: 600px;
 	height: 600px;
 	border: 2px solid #000;
+	.snake {
+		transition: 0.5s;
+	}
 	.snake-dot, .snake-food {
+		transition: 0.5s;
 		position: absolute;
 		width: 2%;
 		height: 2%;
@@ -17,5 +24,19 @@
 	.snake-food {
 		background: #f00;
 		z-index: 1;
+	}
+	.data {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		z-index: 3;
+		p {
+			font-family: arial;
+			color: #777;
+			margin: 1px;
+			&:last-child {
+				font-weight: bold;
+			}
+		}
 	}
 }

@@ -30,6 +30,30 @@ class App extends Component {
 		return [x, y]
 	}
 
+	checkIfOutofBounds = () => {
+		const { snakeDots } = this.state
+		let head = snakeDots[snakeDots.length-1]
+		if(head[0] > 100 || head[0] < 0 || head[1] >100 || head[1]<0) {
+			this.handleGameOver()
+		}
+	}
+
+	handleGameOver = () => {
+		this.setState( (state, props) => {
+			return {
+				food: this.getRandomCoordinates(),
+				speed: 2000,
+				direction: 'RIGHT',
+				snakeDots : [
+					[0,0],
+					[2,0],
+					[4,0]
+				]
+			}
+		})
+		alert(`Game over dude. Your score is ${this.state.snakeDots.length - 3}`)
+	}
+
 	moveSnake = () => {
 		const { snakeDots, direction, move } = this.state
 
@@ -60,55 +84,76 @@ class App extends Component {
 		}
 	}
 
-	componentDidUpdate() {
-		this.checkIfOutofBounds();
-	}
-
 	handleKeyDown = e => {
 		e = e || window.event
 
 		switch(e.keyCode) {
 			case 37:
-				this.setState({ direction: 'LEFT' })
+				this.setState({ move: true, direction: 'LEFT' })
 				break
 			case 38:
-				this.setState({ direction: 'UP' })
+				this.setState({ move: true, direction: 'UP' })
 				break
 			case 39:
-				this.setState({ direction: 'RIGHT' })
+				this.setState({ move: true, direction: 'RIGHT' })
 				break
 			case 40:
-				this.setState({ direction: 'DOWN' })
+				this.setState({ move: true, direction: 'DOWN' })
 				break
 			case 32:
 				this.setState({ move: !this.state.move })
 		}
 	}
 
-	checkIfOutofBounds = () => {
-		const { snakeDots } = this.state
-		let head = snakeDots[snakeDots.length-1]
-		if(head[0] > 100 || head[0] < 0 || head[1] >100 || head[1]<0) {
-			this.handleGameOver()
+	checkIfCollpsed = () => {
+		let snake = [...this.state.snakeDots]
+		let head = snake[snake.length - 1]
+
+		snake.pop()
+		snake.forEach(dot => {
+			if(head[0] == dot[0] && head[1]==dot[1]) {
+				this.handleGameOver()
+			}
+		})
+	}
+
+	checkIfEat() {
+		const { snakeDots, food } = this.state
+
+		let head = snakeDots[snakeDots.length - 1]
+
+		if(head[0]==food[0] && head[1]==food[1]) {
+			this.setState({
+				food: this.getRandomCoordinates()
+			})
+			this.enlargeSnake()
+			this.increaseSpeed()
 		}
 	}
 
-	handleGameOver = () => {
-		this.setState( (state, props) => {
-			return {
-				food: this.getRandomCoordinates(),
-				speed: 2000,
-				direction: 'RIGHT',
-				snakeDots : [
-					[0,0],
-					[2,0],
-					[4,0]
-				]
-			}
+	enlargeSnake = () => {
+		let newSnake = [...this.state.snakeDots]
+		newSnake.unshift([])
+
+		this.setState({
+			snakeDots: newSnake
 		})
-		console.log(this.state)
-		// alert(`Game over dude. Your score is ${this.state.snakeDots.length - 3}`)
-		console.log(`Game over dude. Your score is ${this.state.snakeDots.length - 3}`)
+
+	}
+
+	increaseSpeed = () => {
+		const { speed } = this.state
+		if(speed > 10) {
+			this.setState({
+				speed: speed-10
+			})
+		}
+	}
+
+	componentDidUpdate() {
+		this.checkIfOutofBounds()
+		this.checkIfCollpsed()
+		this.checkIfEat()
 	}
 
 	componentDidMount() {
@@ -118,13 +163,17 @@ class App extends Component {
 	}
 
     render() {
-    	const {snakeDots, food, test} = this.state
+    	const {snakeDots, food, move} = this.state
         return (
             <div className="game-area">
             	<Snake snakeDots={ snakeDots ? snakeDots : test } />
             	<Food dot={food}/>
+            	<div className="data">
+            		<p>Score: {snakeDots.length-3}</p>
+            		<p>{move ? '' : 'PAUSED'}</p>
+            	</div>
             </div>
-        );
+        )
     }
 }
 

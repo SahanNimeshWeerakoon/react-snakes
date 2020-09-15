@@ -2,7 +2,7 @@ import React from 'react'
 
 const Snake = ({snakeDots}) => {
 	return (
-		<div>
+		<div className="snake">
 			{snakeDots.map((dot, i) => {
 				const style = {
 					top: `${dot[1]}%`,
