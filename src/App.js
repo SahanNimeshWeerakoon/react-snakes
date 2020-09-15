@@ -12,6 +12,7 @@ class App extends Component {
 			food: this.getRandomCoordinates(),
 			speed: 200,
 			direction: 'RIGHT',
+			highScore: 0,
 			move: true,
 			snakeDots : [
 				[0,0],
@@ -39,6 +40,7 @@ class App extends Component {
 	}
 
 	handleGameOver = () => {
+		const { snakeDots, highScore } = this.state
 		this.setState( (state, props) => {
 			return {
 				food: this.getRandomCoordinates(),
@@ -51,6 +53,9 @@ class App extends Component {
 				]
 			}
 		})
+		if(snakeDots.length - 3 > highScore) {
+			this.setState({ highScore: snakeDots.length - 3 })
+		}
 		alert(`Game over dude. Your score is ${this.state.snakeDots.length - 3}`)
 	}
 
@@ -118,7 +123,7 @@ class App extends Component {
 	}
 
 	checkIfEat() {
-		const { snakeDots, food } = this.state
+		const { snakeDots, food, highScore } = this.state
 
 		let head = snakeDots[snakeDots.length - 1]
 
@@ -126,6 +131,11 @@ class App extends Component {
 			this.setState({
 				food: this.getRandomCoordinates()
 			})
+
+			if(snakeDots.length - 3 >= highScore) {
+				this.setState({ highScore: snakeDots.length - 2 })
+			}
+			
 			this.enlargeSnake()
 			this.increaseSpeed()
 		}
@@ -163,13 +173,14 @@ class App extends Component {
 	}
 
     render() {
-    	const {snakeDots, food, move} = this.state
+    	const {snakeDots, food, move, highScore} = this.state
         return (
             <div className="game-area">
             	<Snake snakeDots={ snakeDots ? snakeDots : test } />
             	<Food dot={food}/>
             	<div className="data">
             		<p>Score: {snakeDots.length-3}</p>
+            		<p>High Score: {highScore}</p>
             		<p>{move ? '' : 'PAUSED'}</p>
             	</div>
             </div>
